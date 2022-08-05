@@ -31,28 +31,3 @@ export const getWalletFromPkForChain = async ({ pk, chain }): Promise<DirectSecp
     const { bech32_prefix, slip44 } = chain;
     return DirectSecp256k1Wallet.fromKey(fromHex(pk), bech32_prefix)
 };
-
-
-
-
-// now you can create a signer
-// NOT RECOMMENDED TO USE PLAIN-TEXT MNEMONICS
-
-
-// async function main() {
-//     //const mnemonic = 'unfold client turtle either pilot stock floor glow toward bullet car science';
-//     const mnemonic = 'mushroom face letter spell explain armed wheel wait dawn boring canoe candy';
-//     const chain = chains.find(({ chain_name }) => chain_name === 'osmosis');
-//     const signer = await getWalletFromMnemonicForChain({
-//         mnemonic,
-//         chain
-//     });
-//     console.log(await signer.getAccounts()); //osmo1gzvx4lqjl4n28purw6sq58sfryua02q9ck9dft
-// }
-
-// main()
-//     .catch(err => {
-//         console.error(err);
-//         process.exit(-1);
-//     })
-//     .then(() => process.exit());
