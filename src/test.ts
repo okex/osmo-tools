@@ -3,6 +3,7 @@ import { Long } from "@osmonauts/helpers";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import * as tools from './tools';
 import * as dotenv from "dotenv";
+import { SwapAmountInRoute } from 'osmojs/types/proto/osmosis/gamm/v1beta1/tx';
 
 dotenv.config({ path: '.env' });
 const mnemonic = process.env.MNEMONIC;
@@ -22,13 +23,13 @@ async function main() {
 
     //获取账号信息
     const address = "osmo1pek69naq8r6jacval0yk8avmt70qsymp9w9g0j";
-    await tools.getAccountInfo(client, address);
-    console.log("\n")
+    //await tools.getAccountInfo(client, address);
+    //console.log("\n")
 
     //获取Tx信息
     const txHash = "1BB01C47F8ECBC69129B02E04E0CCF7F9527C7B6C45978D9BC92BB1524911975";
-    await tools.getTx(client, txHash);
-    console.log("\n")
+    //await tools.getTx(client, txHash);
+    //console.log("\n")
 
     //UOSMO转账
     const senderAddress = "osmo1pek69naq8r6jacval0yk8avmt70qsymp9w9g0j";
@@ -38,15 +39,38 @@ async function main() {
     //const sendUosmoResult = await tools.sendUosmo(client, senderAddress, recipientAddress, amount, memo);
     //console.log("\nsendUosmoResult:", sendUosmoResult)
 
-    //swapExactAmountIn
+    //单跳交易
+    // const sender = "osmo1pek69naq8r6jacval0yk8avmt70qsymp9w9g0j";
+    // const poolId = new Long(39);
+    // const amountIn = "1500000";
+    // const denomIn = "uosmo";
+    // const denomOut = "ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2";
+    // const minAmountOut = "1000";
+    // const msg = await tools.swapExactAmountInMsg(sender, poolId, amountIn, denomIn, denomOut, minAmountOut)
+    // console.log("\nmsg:", msg)
+
+    //两跳交易
     const sender = "osmo1pek69naq8r6jacval0yk8avmt70qsymp9w9g0j";
-    const poolId = new Long(39);
     const amountIn = "1500000";
     const denomIn = "uosmo";
-    const denomOut = "ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2";
     const minAmountOut = "1000";
-    const msg = await tools.swapExactAmountInMsg(sender, poolId, amountIn, denomIn, denomOut, minAmountOut)
+
+    const poolId1 = new Long(39);
+    const poolId2 = new Long(4);
+    const denomOut1 = "ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2";
+    const denomOut2 = "ibc/1480B8FD20AD5FCAE81EA87584D269547DD4D436843C1D20F15E00EB64743EF4";
+    const routes: SwapAmountInRoute[] = [];
+    routes.push({
+        poolId: poolId1,
+        tokenOutDenom: denomOut1
+    });
+    routes.push({
+        poolId: poolId2,
+        tokenOutDenom: denomOut2
+    });
+    const msg = await tools.multiSwapExactAmountInMsg(sender, amountIn, denomIn, routes, minAmountOut)
     console.log("\nmsg:", msg)
+
 
     //模拟交易
     const simulateResult = await tools.simulateTx(client, sender, [msg], "m2")

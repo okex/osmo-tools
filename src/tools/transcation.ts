@@ -39,6 +39,21 @@ export const swapExactAmountInMsg = async (
     return msg;
 };
 
+export const multiSwapExactAmountInMsg = async (
+    sender: string,
+    amountIn: string,
+    denomIn: string,
+    routes: SwapAmountInRoute[],
+    minAmountOut: string): Promise<EncodeObject> => {
+    const msg = swapExactAmountIn({
+        sender,
+        routes,
+        tokenIn: coin(amountIn, denomIn),
+        tokenOutMinAmount: minAmountOut
+    });
+    return msg;
+};
+
 export const sendUosmo = async (
     client: SigningStargateClient,
     senderAddress: string,
@@ -93,7 +108,7 @@ export const signTx = async (
 ): Promise<TxRaw> => {
     const gasEstimated = await client.simulate(signerAddress, messages, memo);
     const fee = {
-        amount: coins(0, 'uosmo'),
+        amount: coins(558, 'uosmo'),
         gas: new IntPretty(new Dec(gasEstimated).mul(new Dec(1.3)))
             .maxDecimals(0)
             .locale(false)
